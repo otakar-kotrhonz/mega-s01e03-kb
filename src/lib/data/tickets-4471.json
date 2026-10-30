@@ -1,0 +1,8 @@
+{
+  "repo": "https://github.com/otakar-kotrhonz/mega-s01e03-kb",
+  "problems": {
+    "parser": { "issue": 1, "title": "Shared date parser reads day-first dates month first" },
+    "hint": { "issue": 2, "title": "booking-v3 form shows an MM/DD hint to day-first tenants" },
+    "shift": { "issue": 3, "title": "Dates land one day early (time-zone shift, no day/month swap)" }
+  }
+}
