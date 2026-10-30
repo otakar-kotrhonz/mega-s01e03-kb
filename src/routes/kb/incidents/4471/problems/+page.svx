@@ -2,7 +2,7 @@
 layout: runbook
 title: '#4471 · what it holds'
 owner: otakar-kotrhonz
-status: open
+status: closed
 reviewed: 2026-10-30
 signature: otakar-kotrhonz
 ---
