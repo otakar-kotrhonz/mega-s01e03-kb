@@ -1,6 +1,6 @@
 ---
 layout: runbook
-title: '#4471 · three problems, not one'
+title: '#4471 · what it holds'
 owner: otakar-kotrhonz
 status: open
 reviewed: 2026-10-30
@@ -14,47 +14,48 @@ signature: otakar-kotrhonz
 </script>
 
 [#4471](/kb/incidents/4471) says it is one bug with one fix queued. Read report by report, it
-is three problems with three different fixes. The queued parser fix closes only the first one.
+holds more than one problem, and each needs its own fix. The queued parser fix closes only `parser`.
 
 <Callout kind="warn">
-Not known. Three problems, one fix queued. Each problem now has its own ticket.
+Not known. The queued fix covers <code>parser</code> only. Each problem below has its own ticket.
 </Callout>
 
 ## What #4471 holds
 
 <ProblemTable ticket={4471} />
 
-## The three problems
+## The problems
 
-**`parser` — the shared parser reads every date month first.** All our tenants write the day
-first. A booking for 7 April becomes 4 July, through the app, by email and through the
-booking-v2 form. The queued fix is for this one.
+**`parser` — the shared parser reads every date month first.** Every tenant on file writes the
+day first, so a day-first date comes out with day and month swapped: through the app, by email
+and through the booking-v2 form. The queued fix is for this one.
 
-**`hint` — booking-v3 prints `MM/DD/YYYY` under its date field.** Only tenants on booking-v3
-(Alder Physio, Copper Studio, Pale Harbour) and only reports through that form. People type
-what the hint tells them, month first; the form then reads the date the tenant's way, day
-first. The result looks the same as `parser`, so subject-line merging put it in #4471, but the
-parser fix does not touch it. The fix is the hint (or reading the field the way it hints).
+**`hint` — booking-v3 prints a month-first hint under its date field.** Only tenants on
+booking-v3, and only reports through that form. People type what the hint tells them, month
+first; the form then reads the date the tenant's way, day first. The result looks the same as
+`parser`, so subject-line merging put it in #4471, but the parser fix does not touch it. The fix
+is the hint (or reading the field the way it hints).
 
-**`shift` — the date lands one day early.** Day and month are not swapped: Tuesday 12 May shows
-as Monday 11 May, a client in Toronto gets Monday while Lisbon gets Tuesday, an invite arrives
-before the booking was made. That is a date stored or sent as a midnight time and converted
-across time zones. Neither code path in `causes.ts` produces it, so the cause table files these
-under `parser` with a footnote. The table above counts them the desk's way: in `parser`, where
-they are filed, and again as `shift`.
+**`shift` — the date lands a day early.** Day and month are not swapped: the weekday moves back
+by one, a client in another time zone gets a different day for the same meeting, an invite
+arrives before the booking was made. That is a date stored or sent as a midnight time and
+converted across time zones. Neither code path in `causes.ts` produces it, so the cause table on
+#4471 files these under the tenant's cause with a footnote. The table above counts them the
+desk's way: where they are filed, and again as `shift`.
 
 ## Why the merge hid them
 
 - Merging by subject line ([decision 0001](/kb/decisions/0001-dedupe-by-subject)) cannot see
   any of this: every problem arrives as "wrong day".
-- Intake tags come from the reporter's browser, not the tenant. Many reports tagged `hint` are
-  `parser`, and many `hint` reports were tagged `parser`; the table counts by tenant and form.
+- Intake tags come from the reporter's browser, not the tenant. The table counts by tenant and
+  form; compare its two columns.
 - The cause table on #4471 picks the biggest group as the ticket's cause and marks the rest
   "no ticket of its own". They have tickets now.
 
 ## What to do
 
-- Keep #4471 for `parser` only; split `hint` and `shift` into the tickets above.
-- Ship the parser fix, and check booking-v3 and the time-zone path separately: neither is fixed by it.
+- Keep #4471 for `parser`; the other problems have their own tickets above.
+- Ship the parser fix, and check booking-v3 and the time-zone path separately: the parser fix
+  does not reach them.
 
 <RenderStamp {signature} />

@@ -47,6 +47,15 @@
   </tbody>
 </table>
 
+<ul class="muted">
+  {#each groups as g (g.problem)}
+    <li>
+      <code>{g.problem}</code>: {g.tenants.map((h) => `${h} (${tenantOf({ tenant: h })?.form ?? 'no form on file'})`).join(', ')}
+      · e.g. {g.reports[0].id}: “{g.reports[0].body}”
+    </li>
+  {/each}
+</ul>
+
 {#each groups as g (g.problem)}
   {#if g.problem === 'shift'}
     <p class="muted">
