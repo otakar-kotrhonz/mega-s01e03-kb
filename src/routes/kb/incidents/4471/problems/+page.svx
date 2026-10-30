@@ -4,7 +4,7 @@ title: '#4471 · what it holds'
 owner: otakar-kotrhonz
 status: closed
 reviewed: 2026-10-30
-signature: otakar-kotrhonz
+signature: v1.eyJzdWIiOiIxNTg5IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTMzNjMxMzUsImV4cCI6MTc5MzQ0OTUzNX0.5XgJNMz7d3UcWsf1jiSxFOPsk-6UAnbFegJGQaHUSaU
 ---
 
 <script>
@@ -13,11 +13,13 @@ signature: otakar-kotrhonz
   import RenderStamp from '#lib/kb/RenderStamp.svelte';
 </script>
 
-[#4471](/kb/incidents/4471) says it is one bug with one fix queued. Read report by report, it
-holds more than one problem, and each needs its own fix. The queued parser fix closes only `parser`.
+[#4471](/kb/incidents/4471) merged every "wrong day" report into one ticket and called it one bug
+with one fix queued. Read report by report, it holds more than one problem, and each one has its
+own ticket. Engineering has since closed #4471; the table shows how each ticket closed.
 
-<Callout kind="warn">
-Not known. The queued fix covers <code>parser</code> only. Each problem below has its own ticket.
+<Callout>
+Closed. <code>parser</code> is fixed. <code>hint</code> will not be fixed: booking-v3 is retired.
+The one-day moves are merged into <code>parser</code>, where the desk files them.
 </Callout>
 
 ## What #4471 holds
@@ -26,22 +28,22 @@ Not known. The queued fix covers <code>parser</code> only. Each problem below ha
 
 ## The problems
 
-**`parser` — the shared parser reads every date month first.** Every tenant on file writes the
-day first, so a day-first date comes out with day and month swapped: through the app, by email
-and through the booking-v2 form. The queued fix is for this one.
+**`parser` — the shared parser read every date month first.** Every tenant on file writes the
+day first, so a day-first date came out with day and month swapped: through the app, by email
+and through the booking-v2 form. Engineering fixed this one.
 
 **`hint` — booking-v3 prints a month-first hint under its date field.** Only tenants on
 booking-v3, and only reports through that form. People type what the hint tells them, month
 first; the form then reads the date the tenant's way, day first. The result looks the same as
-`parser`, so subject-line merging put it in #4471, but the parser fix does not touch it. The fix
-is the hint (or reading the field the way it hints).
+`parser`, so subject-line merging put it in #4471, but the parser fix does not touch it.
+Engineering will not fix it: the booking-v3 form is retired.
 
 **`shift` — the date lands a day early.** Day and month are not swapped: the weekday moves back
 by one, a client in another time zone gets a different day for the same meeting, an invite
 arrives before the booking was made. That is a date stored or sent as a midnight time and
 converted across time zones. Neither code path in `causes.ts` produces it, so the cause table on
 #4471 files these under the tenant's cause with a footnote. The table above counts them the
-desk's way: where they are filed, and again as `shift`.
+desk's way: where they are filed, and again as `shift`. Their ticket is merged into `parser`'s.
 
 ## Why the merge hid them
 
@@ -52,10 +54,11 @@ desk's way: where they are filed, and again as `shift`.
 - The cause table on #4471 picks the biggest group as the ticket's cause and marks the rest
   "no ticket of its own". They have tickets now.
 
-## What to do
+## What to watch
 
-- Keep #4471 for `parser`; the other problems have their own tickets above.
-- Ship the parser fix, and check booking-v3 and the time-zone path separately: the parser fix
-  does not reach them.
+- The parser fix does not reach a time-zone shift. If one-day moves keep coming after it, reopen
+  the `shift` ticket.
+- Decision 0001 still merges on subject alone, so the next incident will hide its problems the
+  same way. A new decision record should replace it.
 
 <RenderStamp {signature} />

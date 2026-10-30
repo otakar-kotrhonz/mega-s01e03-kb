@@ -10,7 +10,10 @@
 
   const merged = $derived(uniqueById(reports as Report[]).filter((r) => r.mergedInto === ticket));
   const groups = $derived(groupByProblem(merged, tenantOf, notes.oneDayMove));
-  const filed = (p: string) => (tickets.problems as Record<string, { issue: number; title: string }>)[p];
+  type Filed = { issue: number; title: string; outcome: string; note: string; of?: string };
+  const filed = (p: string) => (tickets.problems as Record<string, Filed>)[p];
+  // How a ticket closed, from the engineering update; a duplicate names the ticket it merged into.
+  const outcome = (t: Filed) => (t.of ? `merged into #${filed(t.of).issue}` : t.outcome);
   const tags = (rs: Report[]) =>
     rs.reduce<Record<string, number>>((n, r) => ({ ...n, [r.meta.intakeTag]: (n[r.meta.intakeTag] ?? 0) + 1 }), {});
   const channels = (c: Record<string, number>) =>
@@ -22,12 +25,13 @@
 
 <p class="sum">
   <strong>{merged.length}</strong> reports in #{ticket} ·
-  <strong>{groups.length}</strong> {groups.length === 1 ? 'problem' : 'problems'}
+  <strong>{groups.length}</strong> {groups.length === 1 ? 'problem' : 'problems'} ·
+  #{tickets.update.ticket} closed {tickets.update.closed} ({tickets.update.from})
 </p>
 
 <table>
   <thead>
-    <tr><th>problem</th><th>reports</th><th>tenants</th><th>channels</th><th>intake tagged</th><th>seen</th><th>ticket</th></tr>
+    <tr><th>problem</th><th>reports</th><th>tenants</th><th>channels</th><th>intake tagged</th><th>seen</th><th>ticket</th><th>closed as</th></tr>
   </thead>
   <tbody>
     {#each groups as g (g.problem)}
@@ -42,6 +46,7 @@
         <td>
           {#if t}<a href="{tickets.repo}/issues/{t.issue}">#{t.issue}</a> {t.title}{:else}no ticket yet{/if}
         </td>
+        <td>{#if t}<strong>{outcome(t)}</strong> <span class="muted">· {t.note}</span>{/if}</td>
       </tr>
     {/each}
   </tbody>
