@@ -22,8 +22,7 @@
 
 <p class="sum">
   <strong>{merged.length}</strong> reports in #{ticket} ·
-  <strong>{groups.length}</strong> {groups.length === 1 ? 'problem' : 'problems'} ·
-  <strong>{groups.reduce((n, g) => n + g.reports.length, 0)}</strong> placed
+  <strong>{groups.length}</strong> {groups.length === 1 ? 'problem' : 'problems'}
 </p>
 
 <table>
@@ -50,7 +49,10 @@
 
 {#each groups as g (g.problem)}
   {#if g.problem === 'shift'}
-    <p class="muted">One-day moves: {g.reports.map((r) => r.id).join(', ')}.</p>
+    <p class="muted">
+      One-day moves: {g.reports.map((r) => r.id).join(', ')}. Counted as the desk counts them: also in the
+      row of the cause they are filed under.
+    </p>
   {/if}
 {/each}
 

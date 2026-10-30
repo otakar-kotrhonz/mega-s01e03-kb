@@ -5,10 +5,11 @@ import { causeOf, type Report, type Tenant } from '#lib/kb/causes';
 export type Problem = 'parser' | 'hint' | 'shift';
 
 // `shift` is the desk's own reading (desk-notes.json, oneDayMove): the date lands one day early,
-// day and month are not swapped. Neither code path in causes.ts produces that.
-export function problemOf(r: Report, t: Tenant | undefined, oneDayMove: readonly string[]): Problem | 'unplaced' {
-  if (oneDayMove.includes(r.id)) return 'shift';
-  return causeOf(r, t) ?? 'unplaced';
+// day and month are not swapped. Neither code path in causes.ts produces that. The desk counts
+// these where they are filed (by tenant, so mostly `parser`) and lists them again as `shift`.
+export function problemsOf(r: Report, t: Tenant | undefined, oneDayMove: readonly string[]): (Problem | 'unplaced')[] {
+  const filed = causeOf(r, t) ?? 'unplaced';
+  return oneDayMove.includes(r.id) ? [filed, 'shift'] : [filed];
 }
 
 export type ProblemGroup = {
@@ -27,8 +28,7 @@ export function groupByProblem(
 ): ProblemGroup[] {
   const by = new Map<ProblemGroup['problem'], Report[]>();
   for (const r of reports) {
-    const p = problemOf(r, tenantOf(r), oneDayMove);
-    by.set(p, [...(by.get(p) ?? []), r]);
+    for (const p of problemsOf(r, tenantOf(r), oneDayMove)) by.set(p, [...(by.get(p) ?? []), r]);
   }
   return [...by.entries()]
     .map(([problem, rs]) => {

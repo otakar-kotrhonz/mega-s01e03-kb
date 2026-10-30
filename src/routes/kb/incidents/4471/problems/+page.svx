@@ -40,7 +40,8 @@ parser fix does not touch it. The fix is the hint (or reading the field the way 
 as Monday 11 May, a client in Toronto gets Monday while Lisbon gets Tuesday, an invite arrives
 before the booking was made. That is a date stored or sent as a midnight time and converted
 across time zones. Neither code path in `causes.ts` produces it, so the cause table files these
-under `parser` with a footnote.
+under `parser` with a footnote. The table above counts them the desk's way: in `parser`, where
+they are filed, and again as `shift`.
 
 ## Why the merge hid them
 
